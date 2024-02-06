@@ -34,7 +34,7 @@ N_CLASSES = 4
 # data set dirs:
 
 print_yellow_text('')
-source_dir = '../DATA/ACDC'
+source_dir = 'DATA/ACDC'
 
 print('\033[1;33mSource_dir = \033[0m{0}'.format(source_dir))
 
