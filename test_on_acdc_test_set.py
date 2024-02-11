@@ -190,11 +190,15 @@ def test(sess, model):
         # get ED data and test
         pt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}.nii.gz'.format(str(ed).zfill(2)))
         img_array, specs = get_processed_volumes(fname=pt_full_path)
+        print("debug: img_array shape: ", img_array.shape)
         prediction = sess.run(y_pred, feed_dict={model.acdc_sup_input_data: img_array, model.is_training: False})
+        print("debug: prediction (pre) shape: ", prediction.shape)
         prediction = post_process_segmentation(prediction, specs)
+        print("debug: prediction (post) shape: ", prediction.shape)
 
         gt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}_gt.nii.gz'.format(str(ed).zfill(2)))
         gt_img_array, gt_specs = get_processed_volumes(fname=gt_full_path)
+        print("debug: gt_img_array shape: ", gt_img_array.shape)
 
         first_metric = calculate_metric_percase(prediction == 1, gt_img_array == 1)
         second_metric = calculate_metric_percase(prediction == 2, gt_img_array == 2)
