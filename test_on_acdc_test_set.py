@@ -18,6 +18,7 @@ import config
 import importlib
 from idas.utils.utils import Colors, safe_mkdir
 from data_interface.utils_acdc.prepare_dataset import *
+import numpy as np
 
 # ----------------------------------------------------------------------------------- #
 # test our model on ACDC test data
@@ -34,6 +35,11 @@ FLAGS = tf.app.flags.FLAGS
 
 # ----------------------------------------------------------------------------------- #
 
+def calculate_metric_percase(pred, gt):
+    pred[pred > 0] = 1
+    gt[gt > 0] = 1
+    dice = metric.binary.dc(pred, gt)
+    return dice
 
 def parse_info_cfg(filename):
     """
@@ -167,6 +173,7 @@ def test(sess, model):
     y_pred = model.sup_pred_mask_soft  # model prediction (the output of a softmax)
 
     # iterate over the testing volumes
+    metric_list = []
     for idx in range(101, 151):
         pt_number = str(idx).zfill(3)
         print('Processing test volume: {0}'.format(pt_number))
@@ -184,9 +191,18 @@ def test(sess, model):
         prediction = sess.run(y_pred, feed_dict={model.acdc_sup_input_data: img_array, model.is_training: False})
         prediction = post_process_segmentation(prediction, specs)
 
+        gt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}_gt.nii.gz'.format(str(ed).zfill(2)))
+        gt_img_array, gt_specs = get_processed_volumes(fname=gt_full_path)
+
+        first_metric = calculate_metric_percase(prediction == 1, gt_img_array == 1)
+        second_metric = calculate_metric_percase(prediction == 2, gt_img_array == 2)
+        third_metric = calculate_metric_percase(prediction == 3, gt_img_array == 3)
+
+        metric_list += [(first_metric + second_metric + third_metric) / 3.0]
+
         # save
-        out_name = os.path.join(OUT_DIR, 'patient' + pt_number + '_ED.nii.gz')
-        save_nifti_files(out_name, prediction, specs)
+        #out_name = os.path.join(OUT_DIR, 'patient' + pt_number + '_ED.nii.gz')
+        #save_nifti_files(out_name, prediction, specs)
 
         # -------------------------------------------------------------------
         # get ES data and test
@@ -195,9 +211,20 @@ def test(sess, model):
         prediction = sess.run(y_pred, feed_dict={model.acdc_sup_input_data: img_array, model.is_training: False})
         prediction = post_process_segmentation(prediction, specs)
 
+        gt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}_gt.nii.gz'.format(str(ed).zfill(2)))
+        gt_img_array, gt_specs = get_processed_volumes(fname=gt_full_path)
+
+        first_metric = calculate_metric_percase(prediction == 1, gt_img_array == 1)
+        second_metric = calculate_metric_percase(prediction == 2, gt_img_array == 2)
+        third_metric = calculate_metric_percase(prediction == 3, gt_img_array == 3)
+
+        metric_list += [(first_metric + second_metric + third_metric) / 3.0]
+
         # save
-        out_name = os.path.join(OUT_DIR, 'patient' + pt_number + '_ES.nii.gz')
-        save_nifti_files(out_name, prediction, specs)
+        #out_name = os.path.join(OUT_DIR, 'patient' + pt_number + '_ES.nii.gz')
+        #save_nifti_files(out_name, prediction, specs)
+
+    print('Average Dice: {0}'.format(np.mean(metric_list)))
 
 
 def main(_):
