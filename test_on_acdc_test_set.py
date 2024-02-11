@@ -23,7 +23,7 @@ from data_interface.utils_acdc.prepare_dataset import *
 # test our model on ACDC test data
 EXPERIMENT = 'model_ours_full_acdc'
 DATASET_NAME = 'acdc'
-TEST_ROOT_DIR = '../DATA/ACDC_testing'
+TEST_ROOT_DIR = 'DATA/ACDC_testing'
 OUT_DIR = './acdc_test_results'
 # ----------------------------------------------------------------------------------- #
 
