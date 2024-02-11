@@ -200,21 +200,17 @@ def test(sess, model):
         # get ED data and test
         pt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}.nii.gz'.format(str(ed).zfill(2)))
         img_array, specs = get_processed_volumes(fname=pt_full_path)
-        print("debug: img_array shape: ", img_array.shape)
-        prediction = sess.run(y_pred, feed_dict={model.acdc_sup_input_data: img_array, model.is_training: False})
-        print("debug: prediction (pre) shape: ", prediction.shape)
-        prediction = post_process_segmentation(prediction, specs)
-        print("debug: prediction (post) shape: ", prediction.shape)
+        pre_prediction = sess.run(y_pred, feed_dict={model.acdc_sup_input_data: img_array, model.is_training: False})
+        #prediction = post_process_segmentation(pre_prediction, specs)
 
         gt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}_gt.nii.gz'.format(str(ed).zfill(2)))
-        gt_img_array, gt_specs = get_processed_volumes(fname=gt_full_path)
-        print("debug: gt_img_array shape: ", gt_img_array.shape)
-        gt_img_array = post_process_gt(gt_img_array, specs)
-        print("debug: gt_img_array (post) shape: ", gt_img_array.shape)
+        pre_gt_img_array, gt_specs = get_processed_volumes(fname=gt_full_path)
+        #gt_img_array = post_process_gt(pre_gt_img_array, specs)
 
-        first_metric = calculate_metric_percase(prediction == 1, gt_img_array == 1)
-        second_metric = calculate_metric_percase(prediction == 2, gt_img_array == 2)
-        third_metric = calculate_metric_percase(prediction == 3, gt_img_array == 3)
+        argmax_prediction = np.argmax(pre_prediction, axis=-1)
+        first_metric = calculate_metric_percase(argmax_prediction == 1, pre_gt_img_array == 1)
+        second_metric = calculate_metric_percase(argmax_prediction == 2, pre_gt_img_array == 2)
+        third_metric = calculate_metric_percase(argmax_prediction == 3, pre_gt_img_array == 3)
 
         metric_list += [(first_metric + second_metric + third_metric) / 3.0]
 
@@ -226,16 +222,17 @@ def test(sess, model):
         # get ES data and test
         pt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}.nii.gz'.format(str(es).zfill(2)))
         img_array, specs = get_processed_volumes(fname=pt_full_path)
-        prediction = sess.run(y_pred, feed_dict={model.acdc_sup_input_data: img_array, model.is_training: False})
-        prediction = post_process_segmentation(prediction, specs)
+        pre_prediction = sess.run(y_pred, feed_dict={model.acdc_sup_input_data: img_array, model.is_training: False})
+        #prediction = post_process_segmentation(pre_prediction, specs)
 
         gt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}_gt.nii.gz'.format(str(ed).zfill(2)))
-        gt_img_array, gt_specs = get_processed_volumes(fname=gt_full_path)
-        gt_img_array = post_process_gt(gt_img_array, specs)
+        pre_gt_img_array, gt_specs = get_processed_volumes(fname=gt_full_path)
+        #gt_img_array = post_process_gt(pre_gt_img_array, specs)
 
-        first_metric = calculate_metric_percase(prediction == 1, gt_img_array == 1)
-        second_metric = calculate_metric_percase(prediction == 2, gt_img_array == 2)
-        third_metric = calculate_metric_percase(prediction == 3, gt_img_array == 3)
+        argmax_prediction = np.argmax(pre_prediction, axis=-1)
+        first_metric = calculate_metric_percase(argmax_prediction == 1, pre_gt_img_array == 1)
+        second_metric = calculate_metric_percase(argmax_prediction == 2, pre_gt_img_array == 2)
+        third_metric = calculate_metric_percase(argmax_prediction == 3, pre_gt_img_array == 3)
 
         metric_list += [(first_metric + second_metric + third_metric) / 3.0]
 
