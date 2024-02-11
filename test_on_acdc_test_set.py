@@ -212,7 +212,9 @@ def test(sess, model):
         second_metric = calculate_metric_percase(argmax_prediction == 2, pre_gt_img_array == 2)
         third_metric = calculate_metric_percase(argmax_prediction == 3, pre_gt_img_array == 3)
 
-        metric_list += [(first_metric + second_metric + third_metric) / 3.0]
+        metric_result = (first_metric + second_metric + third_metric) / 3.0
+        metric_list += [metric_result]
+        print("debug: ", metric_result)
 
         # save
         #out_name = os.path.join(OUT_DIR, 'patient' + pt_number + '_ED.nii.gz')
@@ -234,7 +236,9 @@ def test(sess, model):
         second_metric = calculate_metric_percase(argmax_prediction == 2, pre_gt_img_array == 2)
         third_metric = calculate_metric_percase(argmax_prediction == 3, pre_gt_img_array == 3)
 
-        metric_list += [(first_metric + second_metric + third_metric) / 3.0]
+        metric_result = (first_metric + second_metric + third_metric) / 3.0
+        metric_list += [metric_result]
+        print("debug: ", metric_result)
 
         # save
         #out_name = os.path.join(OUT_DIR, 'patient' + pt_number + '_ES.nii.gz')
