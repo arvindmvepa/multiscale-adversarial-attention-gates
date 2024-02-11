@@ -41,7 +41,7 @@ FLAGS = tf.app.flags.FLAGS
 def calculate_metric_percase(pred, gt):
     pred[pred > 0] = 1
     gt[gt > 0] = 1
-    dice_score = dice(pred.flatten(), gt.flatten())
+    dice_score = 1- dice(pred.flatten(), gt.flatten())
     return dice_score
 
 def parse_info_cfg(filename):
