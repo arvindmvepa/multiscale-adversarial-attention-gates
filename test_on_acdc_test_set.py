@@ -209,7 +209,10 @@ def test(sess, model):
 
         argmax_prediction = np.argmax(pre_prediction, axis=-1)
         #print("debug (individual values): ", np.sum(argmax_prediction.shape), np.sum(pre_gt_img_array.shape), np.sum(argmax_prediction==pre_gt_img_array))
-        #print("debug (individual values): ", np.unique(argmax_prediction), np.unique(pre_gt_img_array), np.sum(argmax_prediction == 1), np.sum(pre_gt_img_array == 1))
+        print(np.unique(argmax_prediction))
+        print(np.unique(pre_gt_img_array))
+        print(np.sum(argmax_prediction == 1))
+        print(np.sum(pre_gt_img_array == 1))
         first_metric = calculate_metric_percase(argmax_prediction == 1, pre_gt_img_array == 1)
         second_metric = calculate_metric_percase(argmax_prediction == 2, pre_gt_img_array == 2)
         third_metric = calculate_metric_percase(argmax_prediction == 3, pre_gt_img_array == 3)
