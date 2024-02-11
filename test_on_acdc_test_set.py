@@ -20,6 +20,7 @@ from idas.utils.utils import Colors, safe_mkdir
 from data_interface.utils_acdc.prepare_dataset import *
 import numpy as np
 from scipy.spatial.distance import dice
+import nibabel as nib
 
 
 # ----------------------------------------------------------------------------------- #
@@ -200,54 +201,51 @@ def test(sess, model):
         # get ED data and test
         pt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}.nii.gz'.format(str(ed).zfill(2)))
         img_array, specs = get_processed_volumes(fname=pt_full_path)
-        pre_prediction = sess.run(y_pred, feed_dict={model.acdc_sup_input_data: img_array, model.is_training: False})
-        #prediction = post_process_segmentation(pre_prediction, specs)
+        prediction = sess.run(y_pred, feed_dict={model.acdc_sup_input_data: img_array, model.is_training: False})
+        prediction = post_process_segmentation(prediction, specs)
+
+        # save
+        out_name = os.path.join(OUT_DIR, 'patient' + pt_number + '_ED.nii.gz')
+        save_nifti_files(out_name, prediction, specs)
 
         gt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}_gt.nii.gz'.format(str(ed).zfill(2)))
-        pre_gt_img_array, gt_specs = get_processed_volumes(fname=gt_full_path)
-        #gt_img_array = post_process_gt(pre_gt_img_array, specs)
+        preds = nib.load(out_name)
+        preds =  preds.get_fdata()
+        gt = nib.load(gt_full_path)
+        gt = gt.get_fdata()
 
-        argmax_prediction = np.argmax(pre_prediction, axis=-1)
-        #print("debug (individual values): ", np.sum(argmax_prediction.shape), np.sum(pre_gt_img_array.shape), np.sum(argmax_prediction==pre_gt_img_array))
-        print(np.unique(argmax_prediction))
-        print(np.unique(pre_gt_img_array))
-        print(np.sum(argmax_prediction == 1))
-        print(np.sum(pre_gt_img_array == 1))
-        first_metric = calculate_metric_percase(argmax_prediction == 1, pre_gt_img_array == 1)
-        second_metric = calculate_metric_percase(argmax_prediction == 2, pre_gt_img_array == 2)
-        third_metric = calculate_metric_percase(argmax_prediction == 3, pre_gt_img_array == 3)
+        first_metric = calculate_metric_percase(preds == 1, gt == 1)
+        second_metric = calculate_metric_percase(preds == 2, gt == 2)
+        third_metric = calculate_metric_percase(preds == 3, gt == 3)
 
         metric_result = (first_metric + second_metric + third_metric) / 3.0
         metric_list += [metric_result]
         print("debug: ", metric_result)
-
-        # save
-        #out_name = os.path.join(OUT_DIR, 'patient' + pt_number + '_ED.nii.gz')
-        #save_nifti_files(out_name, prediction, specs)
 
         # -------------------------------------------------------------------
         # get ES data and test
         pt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}.nii.gz'.format(str(es).zfill(2)))
         img_array, specs = get_processed_volumes(fname=pt_full_path)
-        pre_prediction = sess.run(y_pred, feed_dict={model.acdc_sup_input_data: img_array, model.is_training: False})
-        #prediction = post_process_segmentation(pre_prediction, specs)
+        prediction = sess.run(y_pred, feed_dict={model.acdc_sup_input_data: img_array, model.is_training: False})
+        prediction = post_process_segmentation(prediction, specs)
 
         gt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}_gt.nii.gz'.format(str(ed).zfill(2)))
-        pre_gt_img_array, gt_specs = get_processed_volumes(fname=gt_full_path)
-        #gt_img_array = post_process_gt(pre_gt_img_array, specs)
+        preds = nib.load(out_name)
+        preds = preds.get_fdata()
+        gt = nib.load(gt_full_path)
+        gt = gt.get_fdata()
 
-        argmax_prediction = np.argmax(pre_prediction, axis=-1)
-        first_metric = calculate_metric_percase(argmax_prediction == 1, pre_gt_img_array == 1)
-        second_metric = calculate_metric_percase(argmax_prediction == 2, pre_gt_img_array == 2)
-        third_metric = calculate_metric_percase(argmax_prediction == 3, pre_gt_img_array == 3)
+        first_metric = calculate_metric_percase(preds == 1, gt == 1)
+        second_metric = calculate_metric_percase(preds == 2, gt == 2)
+        third_metric = calculate_metric_percase(preds == 3, gt == 3)
 
         metric_result = (first_metric + second_metric + third_metric) / 3.0
         metric_list += [metric_result]
         print("debug: ", metric_result)
 
         # save
-        #out_name = os.path.join(OUT_DIR, 'patient' + pt_number + '_ES.nii.gz')
-        #save_nifti_files(out_name, prediction, specs)
+        out_name = os.path.join(OUT_DIR, 'patient' + pt_number + '_ES.nii.gz')
+        save_nifti_files(out_name, prediction, specs)
 
     print('Average Dice: {0}'.format(np.mean(metric_list)))
 
