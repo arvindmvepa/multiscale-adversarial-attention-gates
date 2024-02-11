@@ -19,6 +19,8 @@ import importlib
 from idas.utils.utils import Colors, safe_mkdir
 from data_interface.utils_acdc.prepare_dataset import *
 import numpy as np
+from scipy.spatial.distance import dice
+
 
 # ----------------------------------------------------------------------------------- #
 # test our model on ACDC test data
@@ -38,8 +40,8 @@ FLAGS = tf.app.flags.FLAGS
 def calculate_metric_percase(pred, gt):
     pred[pred > 0] = 1
     gt[gt > 0] = 1
-    dice = metric.binary.dc(pred, gt)
-    return dice
+    dice_score = dice(pred.flatten(), gt.flatten())
+    return dice_score
 
 def parse_info_cfg(filename):
     """
