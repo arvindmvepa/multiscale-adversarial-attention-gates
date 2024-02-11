@@ -164,7 +164,7 @@ def test(sess, model):
     """ Test the model on ACDC test data """
     # Test
     # sess.run(model.test_init)  # initialize data set iterator on test set:
-    y_pred = model.prediction_soft  # model prediction (the output of a softmax)
+    y_pred = model.sup_pred_mask_soft  # model prediction (the output of a softmax)
 
     # iterate over the testing volumes
     for idx in range(101, 151):
