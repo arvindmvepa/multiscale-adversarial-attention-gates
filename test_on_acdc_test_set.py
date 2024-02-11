@@ -153,6 +153,16 @@ def post_process_segmentation(soft_mask, specs):
     return soft_mask
 
 
+def post_process_gt(mask, specs):
+    shape = [specs['shape'][0], specs['shape'][1]]
+    mask = resize_predicted_batch(mask, new_size=shape, interpolation=cv2.INTER_CUBIC)
+
+    # squeeze and then go back to original axis
+    mask = np.squeeze(mask)
+    mask = np.transpose(mask, axes=[1, 2, 0])
+    return mask
+
+
 def save_nifti_files(name, mask, specs):
     header = specs['header']
     affine = specs['affine']
@@ -199,6 +209,8 @@ def test(sess, model):
         gt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}_gt.nii.gz'.format(str(ed).zfill(2)))
         gt_img_array, gt_specs = get_processed_volumes(fname=gt_full_path)
         print("debug: gt_img_array shape: ", gt_img_array.shape)
+        gt_img_array = post_process_gt(gt_img_array, specs)
+        print("debug: gt_img_array (post) shape: ", gt_img_array.shape)
 
         first_metric = calculate_metric_percase(prediction == 1, gt_img_array == 1)
         second_metric = calculate_metric_percase(prediction == 2, gt_img_array == 2)
@@ -219,6 +231,7 @@ def test(sess, model):
 
         gt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}_gt.nii.gz'.format(str(ed).zfill(2)))
         gt_img_array, gt_specs = get_processed_volumes(fname=gt_full_path)
+        gt_img_array = post_process_gt(gt_img_array, specs)
 
         first_metric = calculate_metric_percase(prediction == 1, gt_img_array == 1)
         second_metric = calculate_metric_percase(prediction == 2, gt_img_array == 2)
