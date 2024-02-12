@@ -121,6 +121,8 @@ class SAUNet(object):
         assert not shape[1] % 16
         assert not shape[2] % 16
 
+        print('Input shape: {}'.format(shape))
+
         with tf.variable_scope('Encoder'):
             en_brick_0, concat_0 = self._encode_brick(incoming, self.nf, self.is_training,
                                                       scope='encode_brick_0', use_bn=self.use_bn)
