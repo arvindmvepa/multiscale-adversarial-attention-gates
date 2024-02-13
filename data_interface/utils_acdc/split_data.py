@@ -57,6 +57,18 @@ def get_splits():
                               71, 6, 52, 43, 45, 63, 93, 14, 98, 88, 21, 28, 99, 54, 90]
             },
         },
+        'all_chaos_mri': {
+            #  this is the percentage of annotated data
+
+            'split0': {
+                # this is the split for the cross-validation
+                'test': [22, 33, 37],
+                'validation': [3, 10, 19],
+                'train_unsup': [1, 5, 13, 20, 31, 34, 38],
+                'train_disc': [2, 8, 15, 21, 32, 36, 39],
+                'train_sup': [1, 5, 13, 20, 31, 34, 38]
+            },
+        },
 
         # -----------------
         # All the data:
