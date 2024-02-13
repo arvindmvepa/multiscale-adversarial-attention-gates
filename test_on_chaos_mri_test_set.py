@@ -194,42 +194,12 @@ def test(sess, model):
         folder_name = 'patient{0}'.format(pt_number)
         prefix = os.path.join(TEST_ROOT_DIR, folder_name)
 
-        # get ED and ES infos and then the patient path
-        ed, es = parse_info_cfg(os.path.join(prefix, 'Info.cfg'))
-
-        # -------------------------------------------------------------------
-        # get ED data and test
-        pt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}.nii.gz'.format(str(ed).zfill(2)))
+        pt_full_path = os.path.join(prefix, 'patient' + pt_number + '_3d_e2.nii.gz')
         img_array, specs = get_processed_volumes(fname=pt_full_path)
         prediction = sess.run(y_pred, feed_dict={model.acdc_sup_input_data: img_array, model.is_training: False})
         prediction = post_process_segmentation(prediction, specs)
 
-        # save
-        out_name = os.path.join(OUT_DIR, 'patient' + pt_number + '_ED.nii.gz')
-        save_nifti_files(out_name, prediction, specs)
-
-        gt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}_gt.nii.gz'.format(str(ed).zfill(2)))
-        preds = nib.load(out_name)
-        preds =  preds.get_fdata()
-        gt = nib.load(gt_full_path)
-        gt = gt.get_fdata()
-
-        first_metric = calculate_metric_percase(preds == 1, gt == 1)
-        second_metric = calculate_metric_percase(preds == 2, gt == 2)
-        third_metric = calculate_metric_percase(preds == 3, gt == 3)
-
-        metric_result = (first_metric + second_metric + third_metric) / 3.0
-        metric_list += [metric_result]
-        print("debug: ", metric_result)
-
-        # -------------------------------------------------------------------
-        # get ES data and test
-        pt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}.nii.gz'.format(str(es).zfill(2)))
-        img_array, specs = get_processed_volumes(fname=pt_full_path)
-        prediction = sess.run(y_pred, feed_dict={model.acdc_sup_input_data: img_array, model.is_training: False})
-        prediction = post_process_segmentation(prediction, specs)
-
-        gt_full_path = os.path.join(prefix, 'patient' + pt_number + '_frame{0}_gt.nii.gz'.format(str(ed).zfill(2)))
+        gt_full_path = os.path.join(prefix, 'patient' + pt_number + '_3d_gt.nii.gz')
         preds = nib.load(out_name)
         preds = preds.get_fdata()
         gt = nib.load(gt_full_path)
@@ -238,8 +208,11 @@ def test(sess, model):
         first_metric = calculate_metric_percase(preds == 1, gt == 1)
         second_metric = calculate_metric_percase(preds == 2, gt == 2)
         third_metric = calculate_metric_percase(preds == 3, gt == 3)
+        fourth_metric = calculate_metric_percase(preds == 4, gt == 4)
 
-        metric_result = (first_metric + second_metric + third_metric) / 3.0
+        print("debug: ", first_metric, second_metric, third_metric, fourth_metric)
+
+        metric_result = (first_metric + second_metric + third_metric + fourth_metric) / 4.0
         metric_list += [metric_result]
         print("debug: ", metric_result)
 

@@ -38,7 +38,7 @@ for run_id_and_path in \
                              --split_number=${split}
 
             data_path_testing='DATA/CHAOS_MRI_testing'
-            python -m test_on_chaos_mri_test_set.py \
+            python -m test_on_chaos_mri_test_set \
                             --RUN_ID="${run_id}"_${perc}_${split} \
                             --CUDA_VISIBLE_DEVICE=${CUDA_VD}  \
                             --data_path=${data_path_testing} \
