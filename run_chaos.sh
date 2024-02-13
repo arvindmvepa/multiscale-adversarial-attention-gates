@@ -4,7 +4,7 @@
 # In this example, we will train the model using 50% of the annotated data. Refer to `data_interface/utils_acdc/split_data`
 # for more details on the training volumes. Finally, we test on the ADCD testing volumes.
 
-dpath='DATA/CHAOS'
+dpath='DATA/CHAOS_MRI'
 res_dir='.'
 dset_name='acdc'
 
