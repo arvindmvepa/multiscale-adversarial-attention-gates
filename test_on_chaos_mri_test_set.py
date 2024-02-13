@@ -214,7 +214,7 @@ def test(sess, model):
         third_metric = calculate_metric_percase(preds == 3, gt == 3)
         fourth_metric = calculate_metric_percase(preds == 4, gt == 4)
 
-        print("debug: class1: {}, class2: {}, class3: {} class4: {}", first_metric, second_metric, third_metric, fourth_metric)
+        print("debug: class1: {}, class2: {}, class3: {} class4: {}".format(first_metric, second_metric, third_metric, fourth_metric))
 
         metric_result = (first_metric + second_metric + third_metric + fourth_metric) / 4.0
         metric_list += [metric_result]
