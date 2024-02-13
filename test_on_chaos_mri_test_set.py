@@ -199,6 +199,10 @@ def test(sess, model):
         prediction = sess.run(y_pred, feed_dict={model.acdc_sup_input_data: img_array, model.is_training: False})
         prediction = post_process_segmentation(prediction, specs)
 
+        # save
+        out_name = os.path.join(OUT_DIR, 'patient' + pt_number + '.nii.gz')
+        save_nifti_files(out_name, prediction, specs)
+
         gt_full_path = os.path.join(prefix, 'patient' + pt_number + '_3d_gt.nii.gz')
         preds = nib.load(out_name)
         preds = preds.get_fdata()
